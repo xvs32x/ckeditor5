@@ -34,9 +34,12 @@ export function downcastInsertTable( options = {} ) {
 
 		const asWidget = options && options.asWidget;
 
+		// TODO: Convert <caption> in <table> to <figure> => <figcaption> + <table>.
 		const figureElement = conversionApi.writer.createContainerElement( 'figure', { class: 'table' } );
 		const tableElement = conversionApi.writer.createContainerElement( 'table' );
+		const figCaptionElement = conversionApi.writer.createContainerElement( 'figcaption' );
 		conversionApi.writer.insert( conversionApi.writer.createPositionAt( figureElement, 0 ), tableElement );
+		conversionApi.writer.insert( conversionApi.writer.createPositionAt( figureElement, 0 ), figCaptionElement );
 
 		let tableWidget;
 
@@ -60,6 +63,10 @@ export function downcastInsertTable( options = {} ) {
 			const tableRow = table.getChild( row );
 			const trElement = viewRows.get( row ) || createTr( tableElement, tableRow, row, tableAttributes, conversionApi );
 			viewRows.set( row, trElement );
+
+			if ( tableRow.name === 'tableCaption' ) {
+				continue;
+			}
 
 			// Consume table cell - it will be always consumed as we convert whole table at once.
 			conversionApi.consumable.consume( cell, 'insert' );

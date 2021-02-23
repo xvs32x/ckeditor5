@@ -187,7 +187,7 @@ describe( 'TableEditing', () => {
 			} );
 		} );
 
-		describe( 'view to model', () => {
+		describe.only( 'view to model', () => {
 			it( 'should convert table', () => {
 				editor.setData( '<table><tbody><tr><td>foo</td></tr></tbody></table>' );
 
@@ -220,6 +220,131 @@ describe( 'TableEditing', () => {
 					.to.equal( '<table><tableRow><tableCell>' +
 						'<media url="https://www.youtube.com/watch?v=H08tGjXNHO4"></media>' +
 					'</tableCell></tableRow></table>' );
+			} );
+
+			describe( 'caption', () => {
+				it( 'should convert a table with <caption>', () => {
+					editor.setData(
+						'<table>' +
+							'<caption>Foo caption</caption>' +
+							'<tbody>' +
+								'<tr>' +
+									'<td>' +
+									'<oembed url="https://www.youtube.com/watch?v=H08tGjXNHO4"></oembed>' +
+									'</td>' +
+								'</tr>' +
+							'</tbody>' +
+						'</table>'
+					);
+
+					expect( getModelData( model, { withoutSelection: true } ) )
+						.to.equal( String(
+							'<table>' +
+								'<tableCaption>Foo caption</tableCaption>' +
+								'<tableRow>' +
+									'<tableCell>' +
+										'<media url="https://www.youtube.com/watch?v=H08tGjXNHO4"></media>' +
+									'</tableCell>' +
+								'</tableRow>' +
+							'</table>'
+						)	);
+				} );
+
+				it.only( 'should convert a table inside <figure> with <figcaption> preceding the table', () => {
+					editor.setData(
+						'<figure class="table">' +
+							'<figcaption>Foo caption</figcaption>' +
+							'<table>' +
+								'<tbody>' +
+									'<tr>' +
+										'<td>' +
+										'<oembed url="https://www.youtube.com/watch?v=H08tGjXNHO4"></oembed>' +
+										'</td>' +
+									'</tr>' +
+								'</tbody>' +
+							'</table>' +
+						'</figure>'
+					);
+
+					expect( getModelData( model, { withoutSelection: true } ) )
+						.to.equal( String(
+							'<table>' +
+								'<tableCaption>' +
+									'Foo caption' +
+								'</tableCaption>' +
+								'<tableRow>' +
+									'<tableCell>' +
+									'<media url="https://www.youtube.com/watch?v=H08tGjXNHO4"></media>' +
+									'</tableCell>' +
+								'</tableRow>' +
+							'</table>'
+						) );
+				} );
+
+				// eslint-disable-next-line max-len
+				it( 'should convert a table inside <figure> with <figcaption> preceding the table - <figcaption> has higher priority', () => {
+					editor.setData(
+						'<figure class="table">' +
+							'<figcaption>Foo caption</figcaption>' +
+							'<table>' +
+								'<caption>Bar caption</caption>' +
+								'<tbody>' +
+									'<tr>' +
+										'<td>' +
+										'<oembed url="https://www.youtube.com/watch?v=H08tGjXNHO4"></oembed>' +
+										'</td>' +
+									'</tr>' +
+								'</tbody>' +
+							'</table>' +
+						'</figure>'
+					);
+
+					expect( getModelData( model, { withoutSelection: true } ) )
+						.to.equal( String(
+							'<paragraph>' +
+							'Foo caption</paragraph>' +
+							'<table>' +
+							'<tableCaption>' +
+							'Bar caption</tableCaption>' +
+							'<tableRow>' +
+							'<tableCell>' +
+							'<media url="https://www.youtube.com/watch?v=H08tGjXNHO4">' +
+							'</media>' +
+							'</tableCell>' +
+							'</tableRow>' +
+							'</table>'
+						) );
+				} );
+
+				it( 'should convert a table inside <figure> with <figcaption> following the table', () => {
+					editor.setData(
+						'<figure class="table">' +
+							'<figcaption>Foo caption</figcaption>' +
+							'<table>' +
+								'<caption>Foo caption</caption>' +
+								'<tbody>' +
+									'<tr>' +
+										'<td>' +
+										'<oembed url="https://www.youtube.com/watch?v=H08tGjXNHO4"></oembed>' +
+										'</td>' +
+									'</tr>' +
+								'</tbody>' +
+							'</table>' +
+						'</figure>'
+					);
+
+					expect( getModelData( model, { withoutSelection: true } ) )
+						.to.equal( String(
+							'<table>' +
+								'<tableCaption>Foo caption</tableCaption>' +
+								'<tableRow>' +
+									'<tableCell>' +
+										'<media url="https://www.youtube.com/watch?v=H08tGjXNHO4"></media>' +
+									'</tableCell>' +
+								'</tableRow>' +
+							'</table>'
+						) );
+				} );
 			} );
 		} );
 	} );
