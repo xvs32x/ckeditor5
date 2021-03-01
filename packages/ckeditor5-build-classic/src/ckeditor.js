@@ -31,10 +31,10 @@ import TableToolbar from '@ckeditor/ckeditor5-table/src/tabletoolbar';
 import TextTransformation from '@ckeditor/ckeditor5-typing/src/texttransformation';
 import CloudServices from '@ckeditor/ckeditor5-cloud-services/src/cloudservices';
 
-export default class ClassicEditor extends ClassicEditorBase {}
+import Markdown from '@ckeditor/ckeditor5-markdown-gfm/src/markdown';
 
 // Plugins to include in the build.
-ClassicEditor.builtinPlugins = [
+const plugins = [
 	Essentials,
 	UploadAdapter,
 	Autoformat,
@@ -58,11 +58,11 @@ ClassicEditor.builtinPlugins = [
 	PasteFromOffice,
 	Table,
 	TableToolbar,
-	TextTransformation
+	TextTransformation,
 ];
 
 // Editor configuration.
-ClassicEditor.defaultConfig = {
+const defaultConfig = {
 	toolbar: {
 		items: [
 			'heading',
@@ -102,3 +102,16 @@ ClassicEditor.defaultConfig = {
 	// This value must be kept in sync with the language defined in webpack.config.js.
 	language: 'en'
 };
+
+class ClassicEditor extends ClassicEditorBase {}
+class MarkdownEditor extends ClassicEditorBase {}
+
+ClassicEditor.builtinPlugins = plugins;
+MarkdownEditor.builtinPlugins = [...plugins, Markdown];
+
+ClassicEditor.defaultConfig = defaultConfig;
+MarkdownEditor.defaultConfig = defaultConfig;
+
+export default {
+	ClassicEditor, MarkdownEditor,
+}
