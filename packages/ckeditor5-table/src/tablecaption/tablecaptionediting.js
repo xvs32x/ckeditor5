@@ -84,52 +84,11 @@ export default class TableCaptionEditing extends Plugin {
 			}
 		} );
 
-		// Captions.
-		// conversion.for( 'upcast' ).elementToElement( { model: 'caption', view: 'caption' } );
-
-		// <figure> => <table> + <figcaption> || <figcaption> + <table>
-		// conversion.for( 'upcast' ).add(
-		// 	dispatcher => dispatcher.on(
-		// 		'element:figcaption',
-		// 		( evt, data, conversionApi ) => {
-		// 			const viewFigcaption = data.viewItem;
-
-		// 			if ( !conversionApi.consumable.test( viewFigcaption, { name: true } ) ) {
-		// 				return;
-		// 			}
-
-		// 			const viewParent = viewFigcaption.parent;
-		// 			if ( viewParent.name !== 'figure' ) {
-		// 				return;
-		// 			}
-
-		// 			const viewTable = Array.from( viewParent.getChildren() ).find( child => child.name === 'table' );
-
-		// 			if ( !viewTable ) {
-		// 				return;
-		// 			}
-
-		// 			const caption = conversionApi.writer.createElement( 'caption' );
-		// 			if ( !conversionApi.safeInsert( caption, data.modelCursor ) ) {
-		// 				return;
-		// 			}
-		// 			// conversionApi.writer.insert( figcaption, conversionApi.writer.createPositionBefore( viewTable ) );
-
-		// 			conversionApi.updateConversionResult( caption, data );
-		// 		}
-		// 	)
-		// );
-
 		editor.editing.mapper.on( 'modelToViewPosition', mapModelPositionToView( view ) );
 		editor.data.mapper.on( 'modelToViewPosition', mapModelPositionToView( view ) );
 	}
 }
 
-// Creates a mapper callback that reverses the order of `<img>` and `<figcaption>` in the image.
-// Without it, `<figcaption>` would precede the `<img>` in the conversion.
-//
-// <image>^</image> -> <figure><img>^<caption></caption></figure>
-//
 // @private
 // @param {module:engine/view/view~View} editingView
 // @returns {Function}
@@ -192,7 +151,7 @@ export function viewFigureToModel() {
 		}
 
 		// Find an table element inside the figure element.
-		const viewTable = getViewTableFromWidget( data.viewItem );
+		const viewTable = getViewTableFromFigure( data.viewItem );
 
 		// Do not convert if table element is absent, is missing src attribute or was already converted.
 		if ( !viewTable || !conversionApi.consumable.test( viewTable, { name: true } ) ) {
@@ -217,25 +176,7 @@ export function viewFigureToModel() {
 	}
 }
 
-export function getViewTableFromWidget( figureView ) {
-	if ( figureView.is( 'element', 'table' ) ) {
-		return figureView;
-	}
-
-	const figureChildren = [];
-
-	for ( const figureChild of figureView.getChildren() ) {
-		figureChildren.push( figureChild );
-
-		if ( figureChild.is( 'element' ) ) {
-			figureChildren.push( ...figureChild.getChildren() );
-		}
-	}
-
-	return figureChildren.find( viewChild => viewChild.is( 'element', 'table' ) );
-}
-
-export function findFromWidget( figureView ) {
+export function getViewTableFromFigure( figureView ) {
 	if ( figureView.is( 'element', 'table' ) ) {
 		return figureView;
 	}

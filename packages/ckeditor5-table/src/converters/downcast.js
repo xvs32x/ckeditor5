@@ -61,6 +61,7 @@ export function downcastInsertTable( options = {} ) {
 			const trElement = viewRows.get( row ) || createTr( tableElement, tableRow, row, tableAttributes, conversionApi );
 			viewRows.set( row, trElement );
 
+			// Ignore caption models.
 			if ( tableRow.name === 'caption' ) {
 				continue;
 			}

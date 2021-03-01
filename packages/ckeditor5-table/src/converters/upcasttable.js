@@ -176,7 +176,9 @@ function scanTable( viewTable ) {
 					}
 				}
 			}
-		} else if ( tableChild.name === 'caption' ) {
+		}
+		// Separate caption from other table elements.
+		else if ( tableChild.name === 'caption' ) {
 			tableMeta.caption = tableChild;
 		}
 	}
