@@ -69,12 +69,6 @@ export default class TableEditing extends Plugin {
 			isBlock: true
 		} );
 
-		schema.register( 'tableCaption', {
-			allowIn: 'table',
-			allowContentOf: '$block',
-			isLimit: true
-		} );
-
 		schema.register( 'tableRow', {
 			allowIn: 'table',
 			isLimit: true
@@ -102,42 +96,6 @@ export default class TableEditing extends Plugin {
 
 		conversion.for( 'editingDowncast' ).add( downcastInsertTable( { asWidget: true } ) );
 		conversion.for( 'dataDowncast' ).add( downcastInsertTable() );
-
-		// Captions.
-		conversion.for( 'upcast' ).elementToElement( { model: 'tableCaption', view: 'caption' } );
-
-		// <figure> => <table> + <figcaption> || <figcaption> + <table>
-		conversion.for( 'upcast' ).add(
-			dispatcher => dispatcher.on(
-				'element:figcaption',
-				( evt, data, conversionApi ) => {
-					const viewFigcaption = data.viewItem;
-
-					if ( !conversionApi.consumable.test( viewFigcaption, { name: true } ) ) {
-						return;
-					}
-
-					const viewParent = viewFigcaption.parent;
-					if ( viewParent.name !== 'figure' ) {
-						return;
-					}
-
-					const viewTable = Array.from( viewParent.getChildren() ).find( child => child.name === 'table' );
-
-					if ( !viewTable ) {
-						return;
-					}
-
-					const caption = conversionApi.writer.createElement( 'tableCaption' );
-					if ( !conversionApi.safeInsert( caption, data.modelCursor ) ) {
-						return;
-					}
-					// conversionApi.writer.insert( figcaption, conversionApi.writer.createPositionBefore( viewTable ) );
-
-					conversionApi.updateConversionResult( caption, data );
-				}
-			)
-		);
 
 		// Table row conversion.
 		conversion.for( 'upcast' ).elementToElement( { model: 'tableRow', view: 'tr' } );

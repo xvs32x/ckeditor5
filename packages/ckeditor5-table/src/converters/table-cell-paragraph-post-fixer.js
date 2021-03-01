@@ -70,7 +70,7 @@ function fixTable( table, writer ) {
 	let wasFixed = false;
 
 	for ( const row of table.getChildren() ) {
-		if ( row.name === 'tableCaption' ) {
+		if ( row.name === 'caption' ) {
 			continue;
 		}
 		wasFixed = fixTableRow( row, writer ) || wasFixed;
